@@ -12,5 +12,6 @@ export * from "./TaskEvents.ts";
 export * from "./llm/mod.ts";
 export * from "./loopInterceptors/mod.ts";
 export * from "./mcp/mod.ts";
+export * from "./skills/mod.ts";
 export * from "./storage/mod.ts";
 export * from "./utils/mod.ts";

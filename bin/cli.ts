@@ -11,6 +11,7 @@ import {
   CopyFileTool,
   createEditFileTools,
   createImageTools,
+  createLoadSkillTool,
   DeleteFileTool,
   FileSearchTool,
   GrepSearchTool,
@@ -51,6 +52,10 @@ const { options: cli } = await new Command()
     "OpenAI API key for image tools when provider=anthropic (ignored if provider=openai)",
   )
   .option("--backup-dir <backupDir:string>", "Directory to store backups")
+  .option(
+    "--skills-dir <skillsDir:string>",
+    "Directory containing Agent Skills (defaults to ./.skills in working directory)",
+  )
   .parse(Deno.args);
 
 function inferProvider(
@@ -116,6 +121,11 @@ async function main(): Promise<void> {
     const agent = new ZypherAgent(
       context,
       providerInstance,
+      {
+        config: {
+          skillsDir: cli.skillsDir,
+        },
+      },
     );
 
     const mcpServerManager = agent.mcp;
@@ -144,10 +154,24 @@ async function main(): Promise<void> {
     const { EditFileTool } = createEditFileTools(backupDir);
     mcpServerManager.registerTool(EditFileTool);
 
+    // Register Skill loading tools
+    await agent.skills.discoverSkills();
+    const LoadSkillTool = createLoadSkillTool(agent.skills);
+    mcpServerManager.registerTool(LoadSkillTool);
+
     console.log(
       "🔧 Registered tools:",
       Array.from(mcpServerManager.tools.keys()).join(", "),
     );
+
+    // Log discovered Skills
+    const skills = agent.skills.getAllSkills();
+    if (skills.length > 0) {
+      console.log(
+        "📚 Discovered Skills:",
+        skills.map((s) => s.metadata.name).join(", "),
+      );
+    }
 
     await runAgentInTerminal(agent, modelToUse);
   } catch (error) {

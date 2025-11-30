@@ -25,6 +25,7 @@ import {
   ToolExecutionInterceptor,
 } from "./loopInterceptors/mod.ts";
 import type { TaskEvent } from "./TaskEvents.ts";
+import { SkillManager } from "./skills/mod.ts";
 
 /**
  * Function that loads the system prompt for the agent.
@@ -61,6 +62,8 @@ export interface ZypherAgentConfig {
   maxTokens: number;
   /** Maximum allowed time for a task in milliseconds before it's automatically cancelled. Default is 15 minutes (900000ms). Set to 0 to disable. */
   taskTimeoutMs: number;
+  /** Custom Skills directory path. Defaults to ./.skills/ in the working directory */
+  skillsDir?: string;
 }
 
 export interface ZypherAgentOptions {
@@ -76,6 +79,8 @@ export interface ZypherAgentOptions {
     mcpServerManager?: McpServerManager;
     /** Custom loop interceptor manager. If not provided, a default instance will be created. */
     loopInterceptorManager?: LoopInterceptorManager;
+    /** Custom Skill manager. If not provided, a default instance will be created. */
+    skillManager?: SkillManager;
   };
   config?: Partial<ZypherAgentConfig>;
 }
@@ -83,6 +88,8 @@ export interface ZypherAgentOptions {
 const DEFAULT_MAX_TOKENS = 8192;
 const DEFAULT_MAX_ITERATIONS = 25;
 const DEFAULT_TASK_TIMEOUT_MS = 900000;
+
+const DEFAULT_SKILLS_DIR = "./.skills";
 
 export class ZypherAgent {
   readonly #modelProvider: ModelProvider;
@@ -92,6 +99,7 @@ export class ZypherAgent {
   readonly #systemPromptLoader: SystemPromptLoader;
   readonly #storageService?: StorageService;
   readonly #fileAttachmentManager?: FileAttachmentManager;
+  readonly #skillManager: SkillManager;
 
   readonly #context: ZypherContext;
   readonly #config: ZypherAgentConfig;
@@ -113,8 +121,25 @@ export class ZypherAgent {
   ) {
     this.#modelProvider = modelProvider;
     this.#context = context;
+
+    // Initialize SkillManager
+    this.#skillManager = options.overrides?.skillManager ??
+      new SkillManager(
+        context,
+        options.config?.skillsDir ?? DEFAULT_SKILLS_DIR,
+      );
+
+    // Create system prompt loader that includes Skills
+    // Skills will be discovered when the system prompt is first loaded
     this.#systemPromptLoader = options.overrides?.systemPromptLoader ??
-      (() => getSystemPrompt(context.workingDirectory));
+      (async () => {
+        // Ensure Skills are discovered before generating prompt
+        await this.#skillManager.discoverSkills();
+        return getSystemPrompt(context.workingDirectory, {
+          skillManager: this.#skillManager,
+        });
+      });
+
     this.#config = {
       maxIterations: options.config?.maxIterations ?? DEFAULT_MAX_ITERATIONS,
       maxTokens: options.config?.maxTokens ?? DEFAULT_MAX_TOKENS,
@@ -176,6 +201,13 @@ export class ZypherAgent {
    */
   get loopInterceptor(): LoopInterceptorManager {
     return this.#loopInterceptorManager;
+  }
+
+  /**
+   * Get the Skill manager for configuration and Skill access
+   */
+  get skills(): SkillManager {
+    return this.#skillManager;
   }
 
   /**

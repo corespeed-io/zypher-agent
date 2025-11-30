@@ -1,4 +1,5 @@
 import { fileExists } from "./data.ts";
+import type { SkillManager } from "../skills/mod.ts";
 
 /**
  * Information about the user's system environment.
@@ -71,6 +72,7 @@ export async function getCustomRules(): Promise<string | null> {
  *  If not provided, defaults to {@link getCurrentUserInfo}(workingDirectory).
  * @param options.customInstructions Additional instructions to append to the system prompt.
  *  If not provided, defaults to {@link getCustomRules}(workingDirectory) which loads from supported rule files in the working directory.
+ * @param options.skillManager Optional SkillManager instance to include Skill metadata in the prompt.
  * @returns The complete system prompt string including custom rules if found
  */
 export async function getSystemPrompt(
@@ -78,6 +80,7 @@ export async function getSystemPrompt(
   options?: {
     userInfo?: UserInfo;
     customInstructions?: string;
+    skillManager?: SkillManager;
   },
 ): Promise<string> {
   const userInfo = options?.userInfo ?? getCurrentUserInfo(workingDirectory);
@@ -164,6 +167,11 @@ ${customRules}
 `
     : "";
 
+  const skillsBlock = options?.skillManager
+    ? options.skillManager.getSkillsMetadataForPrompt()
+    : "";
+
   return `${systemPrompt}
+${skillsBlock}
 ${customRulesBlock}`;
 }
