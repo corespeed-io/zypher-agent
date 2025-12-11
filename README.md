@@ -79,3 +79,47 @@ details.
 ---
 
 Built with ♥️ by [CoreSpeed](https://corespeed.io)
+
+
+```typescript
+
+/**
+ * Deno-compatible ACP Agent Example
+ *
+ * This example demonstrates how to create an ACP agent that runs with Deno.
+ * It uses Deno's native stdin/stdout streams instead of Node.js streams.
+ *
+ * Prerequisites:
+ *   npm run build  # Build the TypeScript SDK first
+ *
+ * Run with:
+ *   deno run --allow-read --allow-write examples/acp-deno-agent.ts
+ *
+ * The deno.json in this directory provides the import map to resolve
+ * the "zod" peer dependency.
+ *
+ * To use with Zed, configure in settings:
+ * {
+ *   "agent_servers": {
+ *     "Deno Example Agent": {
+ *       "command": "deno",
+ *       "args": ["run", "--allow-read", "--allow-write", "/path/to/deno-agent.ts"]
+ *     }
+ *   }
+ * }
+ */
+const input: ReadableStream<Uint8Array> = Deno.stdin.readable;
+const output: WritableStream<Uint8Array> = Deno.stdout.writable;
+
+const stream = acp.ndJsonStream(output, input);
+new acp.AgentSideConnection((conn) => {
+  return createZypherAgent({
+    modelProvider: new AnthropicModelProvider({
+      apiKey: Deno.env.get("ANTHROPIC_API_KEY")!,
+    }),
+    tools: [...createFileSystemTools()],
+    mcpServers: ["@modelcontextprotocol/sequentialthinking-server"],
+    acpConnection: conn,
+  });
+}, stream);
+`

@@ -11,6 +11,7 @@
   ],
   "tasks": {
     "start": "deno run -A bin/cli.ts",
+    "acp": "deno run --allow-read --allow-write --allow-env --allow-net --allow-run bin/acp.ts",
     "compile": "deno compile --allow-all --frozen=true --output dist/cli bin/cli.ts",
     "build:npm": "deno run -A scripts/build_npm.ts",
     "publish:npm": "cd npm && npm publish --access restricted",
@@ -28,6 +29,7 @@
     }
   },
   "imports": {
+    "acp": "npm:@agentclientprotocol/sdk@^0.8.0",
     "@cliffy/command": "jsr:@cliffy/command@^1.0.0-rc.8",
     "@corespeed/mcp-store-client": "jsr:@corespeed/mcp-store-client@^1.9.0",
     "@deno/dnt": "jsr:@deno/dnt@^0.42.3",
