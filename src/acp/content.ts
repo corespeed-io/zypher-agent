@@ -11,7 +11,6 @@
 import type { ContentBlock as AcpContentBlock } from "acp";
 import type { ImageBlock } from "../message.ts";
 
-/** Supported image MIME types (matches Anthropic API) */
 const SUPPORTED_IMAGE_TYPES = new Set([
   "image/jpeg",
   "image/png",
@@ -19,7 +18,6 @@ const SUPPORTED_IMAGE_TYPES = new Set([
   "image/webp",
 ]);
 
-/** Result of converting ACP content blocks */
 export interface PromptContent {
   text: string;
   images: ImageBlock[];
@@ -58,11 +56,9 @@ function convertBlock(
       return { text: formatResourceLink(block) };
 
     case "audio":
-      // Audio transcription not supported - include metadata for context
       return { text: `[Audio: ${block.mimeType}, not transcribed]` };
 
     default:
-      // Unknown content type - preserve type info for debugging
       return {
         text: `[Unsupported content: ${(block as { type: string }).type}]`,
       };
@@ -99,7 +95,6 @@ function convertResource(resource: {
 }): { text: string; image?: ImageBlock } {
   const { uri, text, blob } = resource;
 
-  // Text resource
   if (text !== undefined) {
     const mimeType = resource.mimeType ?? "text/plain";
     return {
@@ -107,7 +102,6 @@ function convertResource(resource: {
     };
   }
 
-  // Blob resource
   if (blob !== undefined) {
     const mimeType = resource.mimeType ?? "application/octet-stream";
     if (SUPPORTED_IMAGE_TYPES.has(mimeType)) {

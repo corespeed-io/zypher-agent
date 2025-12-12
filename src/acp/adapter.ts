@@ -11,27 +11,17 @@ import type { TaskEvent } from "../TaskEvents.ts";
 import type { ToolResultBlock } from "../message.ts";
 import { convertPromptContent } from "./content.ts";
 
-/**
- * Factory function type for creating ZypherAgent instances per session.
- */
 export type AgentFactory = (
   cwd: string,
   mcpServers?: acp.McpServer[],
 ) => Promise<ZypherAgent>;
 
-/**
- * Session state for an ACP session.
- */
 interface AcpSession {
   agent: ZypherAgent;
   abort: AbortController | null;
   toolCallIds: Map<string, string>;
 }
 
-/**
- * ACPProtocolAdapter implements the acp.Agent interface, adapting
- * ZypherAgent instances to the ACP protocol.
- */
 export class ACPProtocolAdapter implements acp.Agent {
   readonly #conn: acp.AgentSideConnection;
   readonly #factory: AgentFactory;

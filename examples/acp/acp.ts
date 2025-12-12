@@ -1,5 +1,3 @@
-#!/usr/bin/env -S deno run --allow-read --allow-write --allow-env --allow-net --allow-run --allow-sys
-
 /**
  * Example: ACP Server
  *
@@ -35,29 +33,27 @@ import { acpStdioServer } from "@corespeed/zypher/acp";
 import { createTool } from "@corespeed/zypher/tools";
 import { z } from "zod";
 
-// Check for API key
 const apiKey = Deno.env.get("ANTHROPIC_API_KEY");
 if (!apiKey) {
   console.error("Error: Set ANTHROPIC_API_KEY environment variable");
   Deno.exit(1);
 }
 
-// Create a weather tool using createTool with Zod schema
 const getWeather = createTool({
   name: "get_weather",
   description: "Get the current weather for a city",
   schema: z.object({
     city: z.string().describe("The city name, e.g. 'Tokyo'"),
   }),
-  // outputSchema documents the structure of result.structuredContent
   outputSchema: z.object({
     city: z.string().describe("The city name"),
     temperature: z.number().describe("Temperature in Celsius"),
-    condition: z.string().describe("Weather condition (e.g., Sunny, Cloudy, Rainy)"),
+    condition: z.string().describe(
+      "Weather condition (e.g., Sunny, Cloudy, Rainy)",
+    ),
     unit: z.literal("celsius").describe("Temperature unit"),
   }),
   execute: ({ city }) => {
-    // Mock weather data for various cities
     const MOCK_WEATHER: Record<string, { temp: number; condition: string }> = {
       tokyo: { temp: 22, condition: "Sunny" },
       london: { temp: 15, condition: "Cloudy" },
@@ -80,7 +76,8 @@ const getWeather = createTool({
     return Promise.resolve({
       content: [{
         type: "text",
-        text: `The weather in ${city} is ${data.condition} with a temperature of ${data.temp}°C`,
+        text:
+          `The weather in ${city} is ${data.condition} with a temperature of ${data.temp}°C`,
       }],
       structuredContent: {
         city,
@@ -92,10 +89,8 @@ const getWeather = createTool({
   },
 });
 
-// Create the model provider
 const modelProvider = new AnthropicModelProvider({ apiKey });
 
-// Create the ACP server with the factory pattern
 const server = acpStdioServer(async (cwd) => {
   return await createZypherAgent({
     modelProvider,

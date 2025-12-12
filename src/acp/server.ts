@@ -8,19 +8,11 @@
 import * as acp from "acp";
 import { ACPProtocolAdapter, type AgentFactory } from "./adapter.ts";
 
-/**
- * Interface for controlling the ACP server lifecycle.
- */
 export interface ACPServer {
-  /** Start the ACP server */
   start(): void;
-  /** Stop the ACP server */
   stop(): void;
 }
 
-/**
- * Internal implementation of ACPServer.
- */
 class ACPServerImpl implements ACPServer {
   #factory: AgentFactory;
   #connection: acp.AgentSideConnection | null = null;
@@ -40,8 +32,6 @@ class ACPServerImpl implements ACPServer {
   }
 
   stop(): void {
-    // The ACP SDK closes the connection when the underlying stream ends.
-    // This method is provided for API completeness.
     this.#connection = null;
   }
 }
