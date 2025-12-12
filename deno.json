@@ -8,7 +8,6 @@
   },
   "tasks": {
     "start": "deno run -A bin/cli.ts",
-    "acp": "deno run --allow-read --allow-write --allow-env --allow-net --allow-run bin/acp.ts",
     "compile": "deno compile --allow-all --frozen=true --output dist/cli bin/cli.ts",
     "build:npm": "deno run -A scripts/build_npm.ts",
     "publish:npm": "cd npm && npm publish --access restricted",

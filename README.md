@@ -80,9 +80,7 @@ details.
 
 Built with ♥️ by [CoreSpeed](https://corespeed.io)
 
-
 ```typescript
-
 /**
  * Deno-compatible ACP Agent Example
  *
@@ -123,3 +121,4 @@ new acp.AgentSideConnection((conn) => {
   });
 }, stream);
 `
+```

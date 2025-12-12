@@ -63,7 +63,9 @@ function convertBlock(
 
     default:
       // Unknown content type - preserve type info for debugging
-      return { text: `[Unsupported content: ${(block as { type: string }).type}]` };
+      return {
+        text: `[Unsupported content: ${(block as { type: string }).type}]`,
+      };
   }
 }
 

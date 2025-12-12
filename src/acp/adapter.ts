@@ -9,18 +9,14 @@ import type * as acp from "acp";
 import type { ZypherAgent } from "../ZypherAgent.ts";
 import type { TaskEvent } from "../TaskEvents.ts";
 import type { ToolResultBlock } from "../message.ts";
-import type { ToolApprovalHandler } from "../loopInterceptors/mod.ts";
 import { convertPromptContent } from "./content.ts";
 
 /**
  * Factory function type for creating ZypherAgent instances per session.
- * The toolApprovalHandler parameter allows the factory to create an agent
- * with ACP permission request support.
  */
 export type AgentFactory = (
   cwd: string,
   mcpServers?: acp.McpServer[],
-  toolApprovalHandler?: ToolApprovalHandler,
 ) => Promise<ZypherAgent>;
 
 /**
