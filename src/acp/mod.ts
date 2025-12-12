@@ -9,4 +9,5 @@
  * @module
  */
 
-export { AcpZypherAgent, type AcpZypherAgentOptions } from "./AcpZypherAgent.ts";
+export { type ACPServer, acpStdioServer } from "./server.ts";
+export type { AgentFactory } from "./adapter.ts";
