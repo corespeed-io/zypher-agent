@@ -1,0 +1,6 @@
+{
+  "imports": {
+    "@corespeed/zypher": "../../src/mod.ts",
+    "@corespeed/zypher/acp": "../../src/acp/mod.ts"
+  }
+}
