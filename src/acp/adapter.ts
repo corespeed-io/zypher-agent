@@ -8,8 +8,36 @@
 import type * as acp from "acp";
 import type { ZypherAgent } from "../ZypherAgent.ts";
 import type { TaskEvent } from "../TaskEvents.ts";
-import type { ToolResultBlock } from "../message.ts";
+import type { ToolResult } from "../tools/mod.ts";
 import { convertPromptContent } from "./content.ts";
+
+/**
+ * Extracts success status and content string from a ToolResult
+ */
+function extractToolResult(result: ToolResult): {
+  success: boolean;
+  content: string;
+} {
+  if (typeof result === "string") {
+    return { success: true, content: result };
+  }
+
+  const success = !result.isError;
+
+  if (result.structuredContent) {
+    return { success, content: JSON.stringify(result.structuredContent) };
+  }
+
+  const content = result.content
+    .map((c) => {
+      if (c.type === "text") return c.text;
+      if (c.type === "image") return "[image]";
+      return JSON.stringify(c);
+    })
+    .join("\n");
+
+  return { success, content };
+}
 
 export type AgentFactory = (
   cwd: string,
@@ -28,19 +56,14 @@ export class ACPProtocolAdapter implements acp.Agent {
   readonly #sessions = new Map<string, AcpSession>();
   readonly #defaultModel: string;
 
-  constructor(
-    conn: acp.AgentSideConnection,
-    factory: AgentFactory,
-  ) {
+  constructor(conn: acp.AgentSideConnection, factory: AgentFactory) {
     this.#conn = conn;
     this.#factory = factory;
     this.#defaultModel = Deno.env.get("ZYPHER_MODEL") ??
       "claude-sonnet-4-20250514";
   }
 
-  initialize(
-    _params: acp.InitializeRequest,
-  ): Promise<acp.InitializeResponse> {
+  initialize(_params: acp.InitializeRequest): Promise<acp.InitializeResponse> {
     return Promise.resolve({
       protocolVersion: 1,
       agentInfo: {
@@ -110,11 +133,11 @@ export class ACPProtocolAdapter implements acp.Agent {
       });
 
       return { stopReason: "end_turn" };
-    } catch (_error) {
+    } catch (error) {
       if (session.abort.signal.aborted) {
         return { stopReason: "cancelled" };
       }
-      throw _error;
+      throw error;
     } finally {
       session.abort = null;
     }
@@ -167,36 +190,53 @@ export class ACPProtocolAdapter implements acp.Agent {
             sessionId,
             update: {
               title: event.toolName,
-              sessionUpdate: "tool_call",
+              sessionUpdate: "tool_call_update",
               toolCallId,
               rawInput: event.partialInput,
+              status: "in_progress",
             },
           });
         }
         break;
       }
 
-      case "message":
-        if (event.message.role === "user") {
-          for (const content of event.message.content) {
-            if (content.type === "tool_result") {
-              const toolResult = content as ToolResultBlock;
-              const toolCallId = session.toolCallIds.get(toolResult.name);
-              if (toolCallId) {
-                this.#conn.sessionUpdate({
-                  sessionId,
-                  update: {
-                    sessionUpdate: "tool_call_update",
-                    toolCallId,
-                    status: toolResult.success ? "completed" : "failed",
-                    rawOutput: toolResult.content,
-                  },
-                });
-                session.toolCallIds.delete(toolResult.name);
-              }
-            }
-          }
+      case "tool_use_result": {
+        const toolCallId = session.toolCallIds.get(event.toolName);
+        if (toolCallId) {
+          const { success, content } = extractToolResult(event.result);
+          this.#conn.sessionUpdate({
+            sessionId,
+            update: {
+              sessionUpdate: "tool_call_update",
+              toolCallId,
+              status: success ? "completed" : "failed",
+              rawOutput: content,
+            },
+          });
+          session.toolCallIds.delete(event.toolName);
         }
+        break;
+      }
+
+      case "tool_use_error": {
+        const toolCallId = session.toolCallIds.get(event.toolName);
+        if (toolCallId) {
+          this.#conn.sessionUpdate({
+            sessionId,
+            update: {
+              sessionUpdate: "tool_call_update",
+              toolCallId,
+              status: "failed",
+              rawOutput: String(event.error),
+            },
+          });
+          session.toolCallIds.delete(event.toolName);
+        }
+        break;
+      }
+
+      case "message":
+        // Tool results are now handled by tool_use_result event
         break;
 
       case "completed":
@@ -213,11 +253,19 @@ export class ACPProtocolAdapter implements acp.Agent {
     if (name.includes("edit") || name.includes("write")) return "edit";
     if (name.includes("delete") || name.includes("remove")) return "delete";
     if (
-      name.includes("search") || name.includes("grep") || name.includes("find")
-    ) return "search";
+      name.includes("search") ||
+      name.includes("grep") ||
+      name.includes("find")
+    ) {
+      return "search";
+    }
     if (
-      name.includes("run") || name.includes("exec") || name.includes("terminal")
-    ) return "execute";
+      name.includes("run") ||
+      name.includes("exec") ||
+      name.includes("terminal")
+    ) {
+      return "execute";
+    }
     return "other";
   }
 }
