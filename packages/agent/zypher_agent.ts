@@ -364,7 +364,7 @@ export class ZypherAgent {
       : timeoutController.signal;
 
     // Set up task timeout if enabled
-    let timeoutId: number | null = null;
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
     if (this.#config.taskTimeoutMs > 0) {
       timeoutId = setTimeout(
         () => timeoutController.abort(),
