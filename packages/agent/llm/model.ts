@@ -30,6 +30,7 @@ const MODEL_BASE_URLS: Record<string, string> = {
   deepseek: "https://api.deepseek.com/v1",
   qwen: "https://dashscope.aliyuncs.com/compatible-mode/v1",
   grok: "https://api.x.ai/v1",
+  minimax: "https://api.minimax.io/v1",
 };
 
 /**
@@ -90,6 +91,7 @@ function inferBaseUrl(model: string): string | undefined {
  * - deepseek* → DeepSeek (api.deepseek.com)
  * - qwen* → Alibaba DashScope (dashscope.aliyuncs.com)
  * - grok* → xAI (api.x.ai)
+ * - minimax* → MiniMax (api.minimax.io)
  *
  * @example
  * ```typescript
@@ -104,6 +106,7 @@ function inferBaseUrl(model: string): string | undefined {
  * const provider = createModelProvider("deepseek-chat");              // → openai (with DeepSeek base URL)
  * const provider = createModelProvider("qwen-plus");                  // → openai (with DashScope base URL)
  * const provider = createModelProvider("grok-2");                     // → openai (with xAI base URL)
+ * const provider = createModelProvider("MiniMax-M3");                  // → openai (with MiniMax base URL)
  * const provider = createModelProvider("llama-3.3-70b");              // → openai (no default URL, self-hosted)
  *
  * // With options (API key optional - falls back to env vars)
