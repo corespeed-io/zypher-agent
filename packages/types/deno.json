@@ -1,0 +1,10 @@
+{
+  "name": "@zypher/types",
+  "version": "0.1.0",
+  "exports": {
+    ".": "./mod.ts"
+  },
+  "imports": {
+    "@modelcontextprotocol/sdk": "npm:@modelcontextprotocol/sdk@^1.25.3"
+  }
+}

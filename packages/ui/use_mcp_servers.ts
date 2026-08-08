@@ -2,8 +2,8 @@ import type {
   McpClientStatus,
   McpServerEndpoint,
   McpServerSource,
-} from "@zypher/agent";
-import type { McpWebSocketEvent } from "@zypher/http";
+} from "@zypher/types";
+import type { McpWebSocketEvent } from "@zypher/types";
 import { retry, scan, timer } from "rxjs";
 import { webSocket } from "rxjs/webSocket";
 import useSWRSubscription from "swr/subscription";

@@ -70,10 +70,12 @@ export type {
 // Utilities
 export { toWebSocketUrl } from "./utils.ts";
 
-// Re-exported types from @zypher/agent
+// Re-exported types from @zypher/types
 export type {
   ContentBlock,
   FileAttachment,
+  HttpTaskEvent,
+  HttpTaskEventId,
   ImageBlock,
   McpClientStatus,
   McpServerEndpoint,
@@ -82,7 +84,4 @@ export type {
   ThinkingBlock,
   ToolResultBlock,
   ToolUseBlock,
-} from "@zypher/agent";
-
-// Re-exported types from @zypher/http
-export type { HttpTaskEvent, HttpTaskEventId } from "@zypher/http";
+} from "@zypher/types";

@@ -1,122 +1,19 @@
-export type ContentBlock =
-  | TextBlock
-  | ImageBlock
-  | ToolUseBlock
-  | ToolResultBlock
-  | FileAttachment
-  | ThinkingBlock;
+// Re-export shared types from @zypher/types (single source of truth)
+export type {
+  Base64ImageSource,
+  ContentBlock,
+  FileAttachment,
+  ImageBlock,
+  Message,
+  TextBlock,
+  ThinkingBlock,
+  ToolResultBlock,
+  ToolUseBlock,
+  UrlImageSource,
+} from "@zypher/types";
 
-/**
- * Extended message parameter type that includes checkpoint information
- */
-export interface Message {
-  content: Array<ContentBlock>;
-
-  role: "user" | "assistant";
-
-  /**
-   * Timestamp indicating when the message was created
-   */
-  timestamp: Date;
-
-  /**
-   * Optional reference to a checkpoint created before this message
-   */
-  checkpointId?: string;
-
-  /**
-   * Optional metadata about the checkpoint
-   */
-  checkpoint?: {
-    id: string;
-    name: string;
-    timestamp: string;
-  };
-}
-
-/**
- * Regular text content
- */
-export interface TextBlock {
-  type: "text";
-  text: string;
-}
-
-/**
- * Image content
- */
-export interface ImageBlock {
-  type: "image";
-  source: Base64ImageSource | UrlImageSource;
-}
-
-/**
- * Base64 image source
- */
-export interface Base64ImageSource {
-  type: "base64";
-  /** The base64 encoded image data */
-  data: string;
-  /** The MIME type of the image */
-  mediaType: string;
-}
-
-/**
- * URL image source
- */
-export interface UrlImageSource {
-  type: "url";
-  /** The URL of the image */
-  url: string;
-  /** The MIME type of the image */
-  mediaType: string;
-}
-
-export interface ToolUseBlock {
-  type: "tool_use";
-  /** The ID of the tool use */
-  toolUseId: string;
-  /** The name of the tool the agent requested to use */
-  name: string;
-  /** The input parameters for the tool */
-  input: unknown;
-}
-
-export interface ToolResultBlock {
-  type: "tool_result";
-  /** The ID of the tool use */
-  toolUseId: string;
-  /** The name of the tool that was used */
-  name: string;
-  /** The input parameters for the tool */
-  input: unknown;
-  /** Whether the tool execution was successful */
-  success: boolean;
-  /** The content of the tool result */
-  content: (TextBlock | ImageBlock)[];
-}
-
-/**
- * File attachment content
- */
-export interface FileAttachment {
-  type: "file_attachment";
-  /** The ID of the file in storage */
-  fileId: string;
-  /** The MIME type of the file */
-  mimeType: string;
-}
-
-/**
- * Thinking block content
- */
-export interface ThinkingBlock {
-  type: "thinking";
-  /** An opaque field and should not be interpreted or parsed - it exists solely for verification purposes. */
-  signature: string;
-  /** The content of the thinking block */
-  thinking: string;
-}
+// Import for local use in type annotations
+import type { FileAttachment, Message } from "@zypher/types";
 
 /**
  * Type guard to validate if an unknown value is a Message object.

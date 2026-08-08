@@ -1,54 +1,24 @@
 import type { TaskEvent as AgentTaskEvent } from "@zypher/agent";
 import { filter, Observable, ReplaySubject } from "rxjs";
 
+// Re-export shared leaf types from @zypher/types
+export type {
+  CustomErrorEvent,
+  ErrorEvent,
+  HeartbeatEvent,
+  StandardErrorEvent,
+} from "@zypher/types";
+import type { ErrorEvent, HeartbeatEvent } from "@zypher/types";
+
 /**
- * Event types for task execution events using discriminated union types
+ * HTTP task event — uses the concrete HttpTaskEventId class (not the interface
+ * from @zypher/types) so that handler code can call static methods like `.generate()`.
  */
 export type HttpTaskEvent =
   & (AgentTaskEvent | HeartbeatEvent | ErrorEvent)
   & {
     eventId: HttpTaskEventId;
   };
-
-/**
- * Heartbeat event data
- */
-export interface HeartbeatEvent {
-  type: "heartbeat";
-  timestamp: number;
-}
-
-/**
- * Standard error event sent when `exposeErrors` is enabled.
- * Contains structured error information from unhandled errors.
- */
-export interface StandardErrorEvent {
-  type: "error";
-  /** Error name/type (e.g., "Error", "TypeError", "APIError") */
-  name: string;
-  /** Error message */
-  message: string;
-  /** Stack trace (if available) */
-  stack?: string;
-}
-
-/**
- * Custom error event sent when using `onError`.
- * Contains whatever fields the handler returns.
- */
-export interface CustomErrorEvent {
-  type: "error";
-  /** Custom fields from onError */
-  [key: string]: unknown;
-}
-
-/**
- * Error event sent to the client before closing the WebSocket on error.
- *
- * - When using `exposeErrors`: {@link StandardErrorEvent} with `name`, `message`, `stack`
- * - When using `onError`: {@link CustomErrorEvent} with custom fields
- */
-export type ErrorEvent = StandardErrorEvent | CustomErrorEvent;
 
 /**
  * Represents a unique identifier for task events with timestamp and sequence components.

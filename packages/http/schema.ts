@@ -1,11 +1,21 @@
 import z from "zod";
 import type { HttpTaskEvent } from "./task_event.ts";
 import type {
-  McpClientStatus,
-  McpServerEndpoint,
-  McpServerManagerEvent,
-  McpServerSource,
-} from "@zypher/agent";
+  McpWebSocketEvent,
+  TaskWebSocketClientMessage as TaskWebSocketClientMessageType,
+} from "@zypher/types";
+import type { McpServerManagerEvent } from "@zypher/agent";
+
+// Re-export shared types from @zypher/types
+export type { McpWebSocketEvent, TaskWebSocketMessage } from "@zypher/types";
+
+/**
+ * Messages sent from the server to the client over the task WebSocket.
+ * Uses the http-local HttpTaskEvent (with concrete HttpTaskEventId class).
+ */
+export type TaskWebSocketServerMessage = HttpTaskEvent;
+
+export type TaskWebSocketClientMessage = TaskWebSocketClientMessageType;
 
 // =============================================================================
 // Common schemas
@@ -26,17 +36,8 @@ export const TaskEventId = z
 // Task WebSocket schemas (/task/ws)
 // =============================================================================
 
-/**
- * Messages sent from the client to the server over the task WebSocket.
- * Uses a discriminated union on the "action" field.
- */
-export type TaskWebSocketClientMessage =
-  | { action: "startTask"; task: string; fileAttachments?: string[] }
-  | { action: "resumeTask"; lastEventId?: string }
-  | { action: "cancelTask" }
-  | { action: "approveTool"; approved: boolean };
 export const TaskWebSocketClientMessage: z.ZodSchema<
-  TaskWebSocketClientMessage
+  TaskWebSocketClientMessageType
 > = z.discriminatedUnion("action", [
   z.object({
     action: z.literal("startTask"),
@@ -57,20 +58,7 @@ export const TaskWebSocketClientMessage: z.ZodSchema<
 ]);
 
 /**
- * Messages sent from the server to the client over the task WebSocket.
- */
-export type TaskWebSocketServerMessage = HttpTaskEvent;
-
-/**
- * All messages that can be sent over the task WebSocket (both directions).
- */
-export type TaskWebSocketMessage =
-  | TaskWebSocketClientMessage
-  | TaskWebSocketServerMessage;
-
-/**
  * Sends a typed message over the task WebSocket connection.
- * Uses a duck-typed interface to accept both WebSocket and WSContext.
  */
 export function sendTaskWebSocketMessage(
   ws: { send: (data: string | ArrayBuffer) => void },
@@ -82,57 +70,6 @@ export function sendTaskWebSocketMessage(
 // =============================================================================
 // MCP WebSocket schemas (/mcp/ws)
 // =============================================================================
-
-/**
- * Events sent over the MCP WebSocket connection (/mcp/ws).
- * These are frontend-friendly versions of internal McpServerManagerEvent.
- */
-export type McpWebSocketEvent =
-  | {
-    /** Sent immediately on connection with the current state of all servers */
-    type: "initial_state";
-    servers: Array<{
-      serverId: string;
-      server: McpServerEndpoint;
-      source: McpServerSource;
-      status: McpClientStatus;
-      enabled: boolean;
-      /** Present when OAuth authentication is required */
-      pendingOAuthUrl?: string;
-    }>;
-  }
-  | {
-    /** Emitted when a new MCP server is registered */
-    type: "server_added";
-    serverId: string;
-    server: McpServerEndpoint;
-    source: McpServerSource;
-  }
-  | {
-    /** Emitted when server configuration or enabled state changes */
-    type: "server_updated";
-    serverId: string;
-    updates: { server?: McpServerEndpoint; enabled?: boolean };
-  }
-  | {
-    /** Emitted when a server is deregistered */
-    type: "server_removed";
-    serverId: string;
-  }
-  | {
-    /** Emitted when client connection status changes (connecting, connected, error, etc.) */
-    type: "client_status_changed";
-    serverId: string;
-    status: McpClientStatus;
-    /** Present when status is "awaitingOAuth" - URL for user to complete OAuth flow */
-    pendingOAuthUrl?: string;
-  }
-  | {
-    /** Emitted on subscription errors */
-    type: "error";
-    /** Custom fields from onError callback */
-    [key: string]: unknown;
-  };
 
 /**
  * Transforms internal McpServerManagerEvent to frontend-friendly McpWebSocketEvent.

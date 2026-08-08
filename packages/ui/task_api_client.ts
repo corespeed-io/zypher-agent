@@ -1,9 +1,9 @@
-import type { Message } from "@zypher/agent";
+import type { Message } from "@zypher/types";
 import type {
   TaskWebSocketClientMessage,
   TaskWebSocketMessage,
   TaskWebSocketServerMessage,
-} from "@zypher/http";
+} from "@zypher/types";
 import type { Observable } from "rxjs";
 import { webSocket, type WebSocketSubject } from "rxjs/webSocket";
 import { toWebSocketUrl } from "./utils.ts";

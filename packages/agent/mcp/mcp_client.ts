@@ -48,16 +48,9 @@ export interface McpClientOptions {
   oauth?: OAuthOptions;
 }
 
-/** Possible state values from the McpClient state machine */
-export type McpClientStatus =
-  | "disconnected"
-  | { connecting: "initializing" | "awaitingOAuth" }
-  | { connected: "initial" | "toolDiscovered" }
-  | "disconnecting"
-  | "disconnectingDueToError"
-  | "error"
-  | "aborting"
-  | "disposed";
+// Re-export shared type from @zypher/types
+export type { McpClientStatus } from "@zypher/types";
+import type { McpClientStatus } from "@zypher/types";
 
 // XState machine events - simplified to only result events
 type McpClientEvent =

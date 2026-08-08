@@ -1,12 +1,13 @@
 import type { Observable } from "rxjs";
-import type { Message } from "../message.ts";
-import type { Tool } from "../tools/mod.ts";
-import type { FileAttachmentCacheMap } from "../storage/mod.ts";
 import type {
+  FinalMessage,
+  Message,
   TaskTextEvent,
   TaskToolUseEvent,
   TaskToolUseInputEvent,
-} from "../task_events.ts";
+} from "@zypher/types";
+import type { Tool } from "../tools/mod.ts";
+import type { FileAttachmentCacheMap } from "../storage/mod.ts";
 
 export interface ModelProviderOptions {
   /**
@@ -86,42 +87,8 @@ export interface ModelStream {
   finalMessage(): Promise<FinalMessage>;
 }
 
-/**
- * Token usage information from an LLM response.
- */
-export interface TokenUsage {
-  /** Input/prompt token usage */
-  input: {
-    /** Total input tokens */
-    total: number;
-    /** Tokens used to create new cache entries (Anthropic only) */
-    cacheCreation?: number;
-    /** Tokens read from cache (cache hit) */
-    cacheRead?: number;
-  };
-  /** Output/completion token usage */
-  output: {
-    /** Total output tokens */
-    total: number;
-    /** Tokens used for reasoning/thinking (OpenAI reasoning models) */
-    thinking?: number;
-  };
-  /** Total tokens (input.total + output.total) */
-  total: number;
-}
-
-export interface FinalMessage extends Message {
-  /**
-   * The reason the model stopped generating.
-   *  "end_turn" - the model reached a natural stopping point
-   *  "max_tokens" - we exceeded the requested max_tokens or the model's maximum
-   *  "stop_sequence" - one of your provided custom stop_sequences was generated
-   *  "tool_use" - the model invoked one or more tools
-   */
-  stop_reason: "end_turn" | "max_tokens" | "stop_sequence" | "tool_use";
-  /** Token usage for this response (undefined if provider doesn't return usage data) */
-  usage?: TokenUsage;
-}
+// Re-export shared types from @zypher/types
+export type { FinalMessage, TokenUsage } from "@zypher/types";
 
 /**
  * Event emitted when a complete message is received from the model

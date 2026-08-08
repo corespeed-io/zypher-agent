@@ -8,16 +8,9 @@ import { convertServerDetailToEndpoint } from "./utils.ts";
 import { type Observable, Subject, type Subscription } from "rxjs";
 import { isAbortError } from "@zypher/utils";
 
-/**
- * Metadata about where an MCP server came from
- *
- * - `registry`: Server was registered from the MCP Store registry.
- *   Contains the package identifier (e.g., "@modelcontextprotocol/server-filesystem")
- * - `direct`: Server was registered directly by the user with explicit configuration
- */
-export type McpServerSource =
-  | { type: "registry"; packageIdentifier: string }
-  | { type: "direct" };
+// Re-export shared type from @zypher/types
+export type { McpServerSource } from "@zypher/types";
+import type { McpServerSource } from "@zypher/types";
 
 /**
  * Represents the internal state of an MCP server including its configuration,

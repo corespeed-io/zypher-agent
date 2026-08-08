@@ -1,5 +1,6 @@
 {
   "workspace": [
+    "packages/types",
     "packages/agent",
     "packages/agui",
     "packages/cli",

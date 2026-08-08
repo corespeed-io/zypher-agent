@@ -13,7 +13,7 @@
     "hexoid": "npm:hexoid@^2.0.0",
     "react": "npm:react@^19.2.4",
     "rxjs": "npm:rxjs@^7.8.2",
-    "rxjs-for-await": "npm:rxjs-for-await@1",
+    "rxjs-for-await": "npm:rxjs-for-await@^1.0.0",
     "swr": "npm:swr@^2.3.3",
     "eslint": "npm:eslint@^9.39.2",
     "eslint-plugin-react-hooks": "npm:eslint-plugin-react-hooks@^7.0.1",
