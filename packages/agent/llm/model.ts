@@ -7,6 +7,7 @@ import {
   OpenAIModelProvider,
   type OpenAIModelProviderOptions,
 } from "./openai.ts";
+import { PROVIDER_PRESETS } from "./provider_presets.ts";
 
 /**
  * Default models for each provider.
@@ -82,6 +83,12 @@ function inferBaseUrl(model: string): string | undefined {
  * - Explicit: "provider/model-id" (e.g., "anthropic/claude-sonnet-4-5-20250929")
  * - Auto-inferred: "model-id" (e.g., "claude-sonnet-4-5-20250929" → anthropic)
  *
+ * MiniMax explicit providers select a protocol and region:
+ * - `minimax` → global OpenAI-compatible endpoint
+ * - `minimax-cn` → China OpenAI-compatible endpoint
+ * - `minimax-anthropic` → global Anthropic-compatible endpoint
+ * - `minimax-cn-anthropic` → China Anthropic-compatible endpoint
+ *
  * Provider is auto-inferred from well-known model name patterns:
  * - Anthropic: claude*, sonnet*, haiku*, opus*
  * - OpenAI (default): Everything else, including OpenAI-compatible models
@@ -98,6 +105,9 @@ function inferBaseUrl(model: string): string | undefined {
  * // Explicit provider/model format
  * const provider = createModelProvider("anthropic/claude-sonnet-4-5-20250929");
  * const provider = createModelProvider("openai/gpt-5.2");
+ * const provider = createModelProvider("minimax-cn/MiniMax-M3");
+ * const provider = createModelProvider("minimax-anthropic/MiniMax-M3");
+ * const provider = createModelProvider("minimax-cn-anthropic/MiniMax-M3");
  *
  * // Auto-inferred provider from model name
  * const provider = createModelProvider("claude-sonnet-4-5-20250929"); // → anthropic
@@ -146,10 +156,13 @@ export function createModelProvider(
   }
 
   const providerKey = provider.toLowerCase();
+  const providerPreset = PROVIDER_PRESETS[providerKey];
+  const resolvedProvider: string = providerPreset?.provider ?? providerKey;
   // Use explicit baseUrl if provided, otherwise infer from model name
-  const baseUrl = options.baseUrl ?? inferBaseUrl(modelId);
+  const baseUrl = options.baseUrl ?? providerPreset?.baseUrl ??
+    inferBaseUrl(modelId);
 
-  switch (providerKey) {
+  switch (resolvedProvider) {
     case "anthropic":
       return new AnthropicModelProvider({
         model: modelId,
