@@ -170,7 +170,7 @@ export function createZypherHandler(options: ZypherHandlerOptions): Hono {
       "/task/ws",
       upgradeWebSocket(
         () => {
-          let firstMessageTimeoutId: number;
+          let firstMessageTimeoutId: ReturnType<typeof setTimeout>;
           let firstMessageReceived = false;
 
           return {
