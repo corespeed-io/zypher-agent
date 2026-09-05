@@ -373,6 +373,7 @@ export function useAgent(options: UseAgentOptions): UseAgentReturn {
       } finally {
         setIsTaskRunning(false);
         setStreamingMessages([]);
+        agentSocketRef.current = null;
       }
     },
     [mutateMessages, onEvent],

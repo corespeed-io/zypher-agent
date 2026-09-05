@@ -144,7 +144,8 @@ Action types:
             await Deno.writeTextFile(target, output, {
               signal: options?.signal,
             });
-            return `Replaced ${occurrences} occurrences`;
+            const replacedCount = params.replaceAll ? occurrences : 1;
+            return `Replaced ${replacedCount} occurrence${replacedCount > 1 ? "s" : ""}`;
           } else {
             return "No occurrences found to replace";
           }
