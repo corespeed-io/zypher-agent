@@ -48,7 +48,7 @@ export class AnthropicModelProvider implements ModelProvider {
   readonly #model: string;
   #client: Anthropic;
   #enablePromptCaching: boolean;
-  #thinkingConfig: Anthropic.ThinkingConfigParam;
+  #thinkingConfig: Anthropic.ThinkingConfigParam | undefined;
 
   constructor(options: AnthropicModelProviderOptions) {
     this.#model = options.model;
@@ -57,13 +57,25 @@ export class AnthropicModelProvider implements ModelProvider {
       baseURL: options.baseUrl,
       ...options.anthropicClientOptions,
     });
-    this.#enablePromptCaching = options.enablePromptCaching ?? true;
-    this.#thinkingConfig = options.thinkingBudget
-      ? {
-        type: "enabled",
-        budget_tokens: options.thinkingBudget,
-      }
-      : { type: "disabled" };
+    // MiniMax manages prompt caching automatically and does not accept cache_control.
+    const isMiniMax = options.model === "MiniMax-M3.1-Flash" ||
+      options.model === "MiniMax-M3";
+    this.#enablePromptCaching = !isMiniMax &&
+      (options.enablePromptCaching ?? true);
+    // Flash always uses adaptive thinking; omit legacy budget/disabled settings.
+    if (options.model === "MiniMax-M3.1-Flash") {
+      this.#thinkingConfig = undefined;
+    } else if (options.model === "MiniMax-M3" && options.thinkingBudget) {
+      // M3 accepts adaptive thinking, not Claude's fixed token budget.
+      this.#thinkingConfig = {
+        // @ts-expect-error The pinned SDK predates MiniMax's adaptive thinking type.
+        type: "adaptive",
+      };
+    } else {
+      this.#thinkingConfig = options.thinkingBudget
+        ? { type: "enabled", budget_tokens: options.thinkingBudget }
+        : { type: "disabled" };
+    }
   }
 
   get info(): ProviderInfo {
