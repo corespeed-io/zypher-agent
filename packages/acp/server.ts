@@ -32,7 +32,7 @@ export interface RunAcpServerOptions {
  * import { runAcpServer } from "@zypher/acp";
  * import { createZypherAgent, createModelProvider } from "@zypher/agent";
  *
- * const modelProvider = createModelProvider("anthropic/claude-sonnet-4-20250514", { apiKey: "..." });
+ * const modelProvider = createModelProvider("anthropic/claude-sonnet-5-5", { apiKey: "..." });
  *
  * await runAcpServer(async (clientConfig) => {
  *   return await createZypherAgent({

@@ -53,7 +53,7 @@ examples/agui/
 
 - `ANTHROPIC_API_KEY` - Your Anthropic API key (required)
 - `PORT` - Server port (default: 8000)
-- `ZYPHER_MODEL` - Model to use (default: claude-sonnet-4-20250514)
+- `ZYPHER_MODEL` - Model to use (default: claude-sonnet-5-5)
 
 ### Custom Tools
 

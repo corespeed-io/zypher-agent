@@ -38,7 +38,7 @@ async function prompt(message: string): Promise<string> {
   }
 }
 
-const DEFAULT_MODEL = "claude-sonnet-4-20250514";
+const DEFAULT_MODEL = "claude-sonnet-5-5";
 
 // Create a simple weather tool
 const getWeather = createTool({

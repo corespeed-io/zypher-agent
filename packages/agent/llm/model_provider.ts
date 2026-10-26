@@ -59,7 +59,7 @@ export interface ModelProvider {
   get info(): ProviderInfo;
 
   /**
-   * Get the model identifier (e.g., "claude-sonnet-4-20250514", "gpt-4o").
+   * Get the model identifier (e.g., "claude-sonnet-5-5", "gpt-4o").
    */
   get modelId(): string;
 

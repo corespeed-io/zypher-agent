@@ -154,7 +154,7 @@ function haikuValidator(): LoopInterceptor {
 
 /** Runs the haiku validator example. */
 async function main() {
-  const model = Deno.env.get("ZYPHER_MODEL") ?? "claude-sonnet-4-20250514";
+  const model = Deno.env.get("ZYPHER_MODEL") ?? "claude-sonnet-5-5";
 
   console.log(
     chalk.bold("\n=== Loop Interceptor Example: Haiku Validator ===\n"),

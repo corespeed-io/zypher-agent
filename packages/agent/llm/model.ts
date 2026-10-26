@@ -173,8 +173,8 @@ export function createModelProvider(
  *
  * @example
  * ```typescript
- * const model = anthropic("claude-sonnet-4-20250514");
- * const model = anthropic("claude-sonnet-4-20250514", { apiKey: "..." });
+ * const model = anthropic("claude-sonnet-5-5");
+ * const model = anthropic("claude-sonnet-5-5", { apiKey: "..." });
  * ```
  */
 export function anthropic(

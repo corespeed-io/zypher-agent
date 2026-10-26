@@ -15,7 +15,7 @@ import { createAguiEventStream, parseRunAgentInput } from "@zypher/agui";
 import type { Message } from "@ag-ui/core";
 import { eachValueFrom } from "rxjs-for-await";
 
-const DEFAULT_MODEL = "claude-sonnet-4-20250514";
+const DEFAULT_MODEL = "claude-sonnet-5-5";
 
 // Example: Weather tool
 const getWeatherTool = createTool({

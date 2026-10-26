@@ -9,7 +9,7 @@
  *
  * Environment variables:
  *   ANTHROPIC_API_KEY - (required) Your Anthropic API key
- *   ZYPHER_MODEL      - (optional) Model to use, defaults to "claude-sonnet-4-20250514"
+ *   ZYPHER_MODEL      - (optional) Model to use, defaults to "claude-sonnet-5-5"
  *
  * Run:
  *   deno run --env -A examples/coding.ts [workspace-path]
@@ -32,7 +32,7 @@ if (workspace !== Deno.cwd()) {
   console.log(`Working directory: ${Deno.cwd()}\n`);
 }
 
-const model = Deno.env.get("ZYPHER_MODEL") ?? "claude-sonnet-4-20250514";
+const model = Deno.env.get("ZYPHER_MODEL") ?? "claude-sonnet-5-5";
 
 console.log(`Using model: ${model}`);
 console.log(`Workspace: ${Deno.cwd()}\n`);

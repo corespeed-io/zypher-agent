@@ -10,7 +10,7 @@
  * Environment variables:
  *   ANTHROPIC_API_KEY - (required) Your Anthropic API key
  *   POSTGRES_URL      - (required) PostgreSQL connection string
- *   ZYPHER_MODEL      - (optional) Model to use, defaults to "claude-sonnet-4-20250514"
+ *   ZYPHER_MODEL      - (optional) Model to use, defaults to "claude-sonnet-5-5"
  *
  * Run:
  *   deno run --env -A examples/calendar.ts
@@ -213,7 +213,7 @@ const SYSTEM_PROMPT =
 4. Delete appointments
 5. Convert times between timezones`;
 
-const model = Deno.env.get("ZYPHER_MODEL") ?? "claude-sonnet-4-20250514";
+const model = Deno.env.get("ZYPHER_MODEL") ?? "claude-sonnet-5-5";
 const postgresUrl = getRequiredEnv("POSTGRES_URL");
 
 console.log(`Using model: ${model}`);
